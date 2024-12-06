@@ -17,33 +17,54 @@ const List = () => {
 
 
     const fetchMovieList = async () => {
+
+        const cacheKey = id ? `${genre}_movie_page_${page}` : tid ? `${genre}_tv_page_${page}` : lan ? `${lan}_lan_page_${page}` : `${title}_page_${page}`;
+        const cachedMovies = localStorage.getItem(cacheKey);
+    
+        if (cachedMovies) {
+            setMovieList(JSON.parse(cachedMovies));
+            setIsLoading(false);
+            console.log("Loaded movies list from cache");
+            return;
+        }
+
         try {
+            let list;
+
             if (id) {
-                const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=f626527768d4e789af98c53f48a0d3bd&with_genres=${id}&page=${page}`);
-                setMovieList(response.data.results);
+                const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${import.meta.env.VITE_APP_API_KEY}&with_genres=${id}&page=${page}`);
+                list = response.data.results;
+                //setMovieList(response.data.results);
             }
 
             if (lan) {
-                const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=f626527768d4e789af98c53f48a0d3bd&with_original_language=${lan}&page=${page}`);
-                setMovieList(response.data.results);
+                const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${import.meta.env.VITE_APP_API_KEY}&with_original_language=${lan}&page=${page}`);
+                list = response.data.results;
+                //setMovieList(response.data.results);
             }
 
             if (tid) {
-                const response = await axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=f626527768d4e789af98c53f48a0d3bd&with_genres=${tid}&page=${page}`);
+                const response = await axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${import.meta.env.VITE_APP_API_KEY}&with_genres=${tid}&page=${page}`);
+                list = response.data.results;
                 console.log("res -------> ",response);
-                setMovieList(response.data.results);
+                //setMovieList(response.data.results);
             }
 
             if (title) {
-                const response = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=f626527768d4e789af98c53f48a0d3bd&query=${title}&page=${page}`);
+                const response = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=${import.meta.env.VITE_APP_API_KEY}&query=${title}&page=${page}`);
 
                 const filteredResults = response.data.results.filter(
                     (result) => result.media_type === "movie" || result.media_type === "tv"
                 );
+                list = filteredResults;
                 //console.log("res ------> ", filteredResults);
 
-                setMovieList(filteredResults);
+                //setMovieList(filteredResults);
             }
+
+            localStorage.setItem(cacheKey, JSON.stringify(list));
+            setMovieList(list);
+            console.log("Fetched list from API and stored in cache");
         } catch (error) {
             if (tid) {toast.error("Error fetching tv series", {
                 position: 'top-center'

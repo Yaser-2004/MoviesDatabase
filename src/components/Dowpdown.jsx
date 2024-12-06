@@ -15,7 +15,7 @@ const Dowpdown = ({text, g, l, w}) => {
     useEffect(() => {
         const fetchGenres = async () => {
             try {
-                const response = await axios.get("https://api.themoviedb.org/3/genre/movie/list?api_key=f626527768d4e789af98c53f48a0d3bd");
+                const response = await axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=${import.meta.env.VITE_APP_API_KEY}`);
                 setGenres(response.data.genres);
             } catch (error) {
                 console.error("Error fetching movie genres", error);
@@ -24,7 +24,7 @@ const Dowpdown = ({text, g, l, w}) => {
 
         const fetchseriesGenres = async () => {
             try {
-                const response = await axios.get("https://api.themoviedb.org/3/genre/tv/list?api_key=f626527768d4e789af98c53f48a0d3bd");
+                const response = await axios.get(`https://api.themoviedb.org/3/genre/tv/list?api_key=${import.meta.env.VITE_APP_API_KEY}`);
                 setSeriesGenres(response.data.genres);
             } catch (error) {
                 console.error("Error fetching series genres", error);

@@ -18,19 +18,34 @@ const CardSection = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchMovies = async () => {
+        const cacheKey = `movies_page_${page}`;
+        const cachedMovies = localStorage.getItem(cacheKey);
+    
+        if (cachedMovies) {
+            setMovies(JSON.parse(cachedMovies));
+            setIsLoading(false);
+            console.log("Loaded movies from cache");
+            return;
+        }
+    
         try {
-            const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?language=en-US&page=${page}&api_key=f626527768d4e789af98c53f48a0d3bd`);
+            const response = await axios.get(
+                `https://api.themoviedb.org/3/movie/popular?language=en-US&page=${page}&api_key=${import.meta.env.VITE_APP_API_KEY}`
+            );
+    
+            localStorage.setItem(cacheKey, JSON.stringify(response.data.results));
             setMovies(response.data.results);
-            // console.log("---> movies --->", movies)
+            console.log("Fetched movies from API and stored in cache");
         } catch (error) {
             toast.error("Error fetching movies :(", {
-                position: 'top-center'
+                position: "top-center",
             });
             console.error("Error fetching movies: ", error);
         } finally {
             setIsLoading(false);
         }
-    }
+    };
+    
 
     useEffect(() => {
         setIsLoading(true);

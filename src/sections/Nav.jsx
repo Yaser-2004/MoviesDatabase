@@ -15,7 +15,7 @@ const Nav = () => {
         setQuery(e.target.value);
         if(e.target.value.trim()) {
             try {
-                const response = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=f626527768d4e789af98c53f48a0d3bd&query=${e.target.value}`);
+                const response = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=${import.meta.env.VITE_APP_API_KEY}&query=${e.target.value}`);
                 const filteredResults = response.data.results.filter(
                     (result) => result.media_type === "movie" || result.media_type === "tv"
                 );
