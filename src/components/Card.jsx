@@ -2,7 +2,7 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-
+//props from parent component
 const Card = ({image, title, id, tid}) => {
 
   return (
@@ -18,7 +18,7 @@ const Card = ({image, title, id, tid}) => {
   )
 }
 
-Card.propTypes = {
+Card.propTypes = { 
     image: PropTypes.string,
     title: PropTypes.string,
     id: PropTypes.number,

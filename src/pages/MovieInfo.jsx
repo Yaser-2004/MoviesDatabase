@@ -8,21 +8,25 @@ import Loader from "../components/Loader";
 
 const MovieInfo = () => {
 
-    const {id, tid} = useParams();
-    const [movieInfo, setMovieInfo] = useState({});
-    const [director, setDirector] = useState({});
-    const [actors, setActors] = useState([]);
-    const [numberOfSeasons, setNumberOfSeasons] = useState(1);
+    const {id, tid} = useParams(); //fetching id(movies id) and tid(tv series id) from url parameters
+    const [movieInfo, setMovieInfo] = useState({}); 
+    const [director, setDirector] = useState({}); //show director
+    const [actors, setActors] = useState([]); //show actors
+    const [numberOfSeasons, setNumberOfSeasons] = useState(1); // no. of seasons for tv series
     const [isLoading, setIsLoading] = useState(true);
-    const [trailerUrl, setTrailerUrl] = useState("");
+    const [trailerUrl, setTrailerUrl] = useState(""); //url for trailer
 
     const fetchMovieDetails = async () => {
+        //fetching movie and series details from api
         try {
+
+            //for movies
             if (id) {
                 const response = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_APP_API_KEY}`);
                 setMovieInfo(response.data);
             }
 
+            //for tv series
             if (tid) {
                 const response = await axios.get(`https://api.themoviedb.org/3/tv/${tid}?api_key=${import.meta.env.VITE_APP_API_KEY}`);
                 setMovieInfo(response.data);
@@ -38,24 +42,30 @@ const MovieInfo = () => {
         }
     }
 
+    //fetching the credits(for actors and directors) from api
     const fetchCredits = async () => {
         try {
             let response;
             if (id) response = await axios.get(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${import.meta.env.VITE_APP_API_KEY}`);
             if (tid) response = await axios.get(`https://api.themoviedb.org/3/tv/${tid}/credits?api_key=${import.meta.env.VITE_APP_API_KEY}`);
 
+            //finding the director from the crew
             const resultDirector = response.data.crew.find((crewMember) => (crewMember.job === "Director") || (crewMember.known_for_department === "Directing"));
             
+            //if director available
             if (resultDirector) {
                 setDirector(resultDirector);
             } else {
                 console.log("Director not found");  
             }
 
+            //filetring the cast to get the actors
             const resultActor = response.data.cast
                                                 .filter((actor) => actor.known_for_department === "Acting")
-                                                .sort((a, b) => a.order - b.order)
+                                                .sort((a, b) => a.order - b.order) //sorting the top 3 actors 
                                                 .slice(0, 3);
+            
+            //if actors available
             if (resultActor) {
                 setActors(resultActor);
             } else {
@@ -70,6 +80,7 @@ const MovieInfo = () => {
         }
     } 
 
+    //fetching show trailer
     const fetchTrailer = async (id) => {
         try {
             let response;
@@ -78,17 +89,19 @@ const MovieInfo = () => {
             if (tid) response = await axios.get(`https://api.themoviedb.org/3/tv/${id}/videos?&api_key=${import.meta.env.VITE_APP_API_KEY}`);
             console.log("-------->", response);
             
+
+            //finding the trailer from the result
             const trailer = response.data.results.find((video) => (
-                video.type === 'Trailer' && video.site === 'YouTube'
+                video.type === 'Trailer' && video.site === 'YouTube' //video type trailer
             ));
-            if (trailer) setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}`);
+            if (trailer) setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}`); //setting the trailer url
         } catch (error) {
             console.log("Error fetching trailer: ", error);
         }
     }
 
     useEffect(() => {
-        fetchTrailer(id ? id : tid);
+        fetchTrailer(id ? id : tid); //trailer for movie or tv series
         fetchMovieDetails();
         fetchCredits();
         //fetchDirector();

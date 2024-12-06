@@ -6,13 +6,15 @@ import { Link } from "react-router-dom";
 
 const Dowpdown = ({text, g, l, w}) => {
 
-    const [hover, setHover] = useState(false);
-    const [genres, setGenres] = useState([]);
-    const [seriesGenres, setSeriesGenres] = useState([]);
-    const languages = ["English", "French", "German", "Hindi", "Italian", "Kannada", "Japanese", "Spanish"];
+    const [hover, setHover] = useState(false); //hover state
+    const [genres, setGenres] = useState([]); //fetching available movie genres
+    const [seriesGenres, setSeriesGenres] = useState([]); //fetching available series genres
+    const languages = ["English", "French", "German", "Hindi", "Italian", "Kannada", "Japanese", "Spanish"]; //available languages
     const lanCodes = ["en", "fr", "nl", "hi", "it", "kn", "ja", "es"];
 
+    //fetching available genres in the starting
     useEffect(() => {
+        //movie genres
         const fetchGenres = async () => {
             try {
                 const response = await axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=${import.meta.env.VITE_APP_API_KEY}`);
@@ -22,6 +24,7 @@ const Dowpdown = ({text, g, l, w}) => {
             }
         }
 
+        //series genres
         const fetchseriesGenres = async () => {
             try {
                 const response = await axios.get(`https://api.themoviedb.org/3/genre/tv/list?api_key=${import.meta.env.VITE_APP_API_KEY}`);

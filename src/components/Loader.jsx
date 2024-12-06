@@ -1,5 +1,5 @@
-
-import {TailSpin} from "react-loader-spinner";
+//Loader Component
+import {TailSpin} from "react-loader-spinner"; //from react-loader-spinner
 
 const Loader = () => {
     return (

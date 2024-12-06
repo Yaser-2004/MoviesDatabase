@@ -8,27 +8,30 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Nav = () => {
 
-    const [query, setQuery] = useState("");
-    const [shows, setShows] = useState([]);
+    const [query, setQuery] = useState(""); //query from search bar
+    const [shows, setShows] = useState([]); //shows from api
 
     const handleSearch = async (e) => {
-        setQuery(e.target.value);
-        if(e.target.value.trim()) {
+        setQuery(e.target.value); //set query from search bar
+        if(e.target.value.trim()) { //trim white spaces
             try {
                 const response = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=${import.meta.env.VITE_APP_API_KEY}&query=${e.target.value}`);
+
+                //filtering the response to get movies and tv series
                 const filteredResults = response.data.results.filter(
                     (result) => result.media_type === "movie" || result.media_type === "tv"
                 );
                 console.log("res ------> ", filteredResults);
-                setShows(filteredResults);
+                setShows(filteredResults); //set the filetered results to shows state
             } catch (error) {
+                //error handling
                 toast.error("Error searching the query", {
                     position: 'top-center'
                 })
                 console.error(error);
             }
         } else {
-            setShows([]);
+            setShows([]); //clear the shows state if the search bar is empty
         }
     }
 

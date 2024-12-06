@@ -10,17 +10,18 @@ import Loader from "../components/Loader";
 
 const List = () => {
 
-    const {id, lan, tid, title, pageNum, genre} = useParams();
+    const {id, lan, tid, title, pageNum, genre} = useParams(); //obtaining id(for movies), tid(for tv series), title(for search functionality), page number and genre from parameters
     const [movieList, setMovieList] = useState([]);
     const page = Number(pageNum) || 1;
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true); //loading state for loaders
 
 
     const fetchMovieList = async () => {
 
-        const cacheKey = id ? `${genre}_movie_page_${page}` : tid ? `${genre}_tv_page_${page}` : lan ? `${lan}_lan_page_${page}` : `${title}_page_${page}`;
-        const cachedMovies = localStorage.getItem(cacheKey);
+        const cacheKey = id ? `${genre}_movie_page_${page}` : tid ? `${genre}_tv_page_${page}` : lan ? `${lan}_lan_page_${page}` : `${title}_page_${page}`;  //caching key is created
+        const cachedMovies = localStorage.getItem(cacheKey); //fetching movies available in local storage
     
+        //if present in local storage return movies
         if (cachedMovies) {
             setMovieList(JSON.parse(cachedMovies));
             setIsLoading(false);
@@ -28,21 +29,25 @@ const List = () => {
             return;
         }
 
+        // if not in local storage fetch from api
         try {
             let list;
 
+            //for movies filtered on genre 
             if (id) {
                 const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${import.meta.env.VITE_APP_API_KEY}&with_genres=${id}&page=${page}`);
                 list = response.data.results;
                 //setMovieList(response.data.results);
             }
 
+            //for movies filtered on languages
             if (lan) {
                 const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${import.meta.env.VITE_APP_API_KEY}&with_original_language=${lan}&page=${page}`);
                 list = response.data.results;
                 //setMovieList(response.data.results);
             }
 
+            //for tv series filtered on genres
             if (tid) {
                 const response = await axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${import.meta.env.VITE_APP_API_KEY}&with_genres=${tid}&page=${page}`);
                 list = response.data.results;
@@ -50,6 +55,7 @@ const List = () => {
                 //setMovieList(response.data.results);
             }
 
+            //for search functionality
             if (title) {
                 const response = await axios.get(`https://api.themoviedb.org/3/search/multi?api_key=${import.meta.env.VITE_APP_API_KEY}&query=${title}&page=${page}`);
 
@@ -62,14 +68,15 @@ const List = () => {
                 //setMovieList(filteredResults);
             }
 
-            localStorage.setItem(cacheKey, JSON.stringify(list));
+            localStorage.setItem(cacheKey, JSON.stringify(list)); //setting in local storage
             setMovieList(list);
             console.log("Fetched list from API and stored in cache");
         } catch (error) {
-            if (tid) {toast.error("Error fetching tv series", {
+            //error handling
+            if (tid) {toast.error("Error fetching tv series", { //if error in fetching tv series
                 position: 'top-center'
             })} else {
-                toast.error("Error fetching movies", {
+                toast.error("Error fetching movies", { //if error in fetching movies
                     position: 'top-center'
                 })
             }

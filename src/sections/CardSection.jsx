@@ -12,53 +12,57 @@ import Loader from "../components/Loader";
 
 const CardSection = () => {
 
-    const {pageNum} = useParams();
-    const page = Number(pageNum) || 1;
-    const [movies, setMovies] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const {pageNum} = useParams(); //obtaiting the page number from parameters
+    const page = Number(pageNum) || 1; //page number is converted to number and if it is not provided then it is set to 1
+    const [movies, setMovies] = useState([]); //movies array is created
+    const [isLoading, setIsLoading] = useState(true); //loading state is created
 
+    //function to fetch movies from API
     const fetchMovies = async () => {
-        const cacheKey = `movies_page_${page}`;
-        const cachedMovies = localStorage.getItem(cacheKey);
+        const cacheKey = `movies_page_${page}`; //caching key is created
+        const cachedMovies = localStorage.getItem(cacheKey); //cached movies retrieving from local storage
     
+        //if movies are cached then they are returned
         if (cachedMovies) {
             setMovies(JSON.parse(cachedMovies));
-            setIsLoading(false);
-            console.log("Loaded movies from cache");
+            setIsLoading(false); //loading state is set to false to stop loading as soon as movies are fetched
+            console.log("Loaded movies from cache"); //not necessarily needed
             return;
         }
     
+        //if movies are not cached then fetched from API
         try {
             const response = await axios.get(
                 `https://api.themoviedb.org/3/movie/popular?language=en-US&page=${page}&api_key=${import.meta.env.VITE_APP_API_KEY}`
             );
     
-            localStorage.setItem(cacheKey, JSON.stringify(response.data.results));
-            setMovies(response.data.results);
+            localStorage.setItem(cacheKey, JSON.stringify(response.data.results)); //after fetching movies cached in local storage
+            setMovies(response.data.results); //movies set to the state
             console.log("Fetched movies from API and stored in cache");
         } catch (error) {
+            //toast for any error during fetching movies
             toast.error("Error fetching movies :(", {
                 position: "top-center",
             });
             console.error("Error fetching movies: ", error);
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); //after everything loading set to false
         }
     };
     
 
     useEffect(() => {
-        setIsLoading(true);
+        setIsLoading(true); //for every new page, loading set to true
         fetchMovies()
     }, [page])
 
     if (isLoading && page > 1) {
-        return <Loader />
+        return <Loader /> //Loader for page>1, coz one loader is there for the home page initially
     }
 
   return (
     <>
-    <ToastContainer />
+    <ToastContainer /> 
     <div className="CardSection flex gap-10 max-sm:gap-6 flex-wrap justify-center items-center mt-20 max-sm:mt-10 pb-20">
       {movies.map((movie, i) => {
         return <Card key={i} image={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} title={movie.original_title+" ("+movie.release_date.slice(0, 4)+")"} id={movie.id} />;
